@@ -1,7 +1,13 @@
 #![feature(async_await, futures_api)]
+#[macro_use]
+
+extern crate diesel;
+extern crate dotenv;
 
 use futures::future::FutureObj;
 use tide::{head::Path, middleware::RequestContext, ExtractConfiguration, Response};
+
+mod database;
 
 /// A type that represents how much value will be added by the `add` handler.
 #[derive(Clone, Debug, Default)]
@@ -24,6 +30,8 @@ fn debug_store(ctx: RequestContext<()>) -> FutureObj<Response> {
 
 fn main() {
     let mut app = tide::App::new(());
+
+    database::establish_connection();
     // `App::config` sets the default configuration of the app (that is, a top-level router).
     app.config(IncreaseBy(1));
     app.middleware(debug_store);
