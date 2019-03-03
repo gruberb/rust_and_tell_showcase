@@ -1,6 +1,6 @@
 CREATE TABLE talks (
   id SERIAL PRIMARY KEY,
   title VARCHAR NOT NULL,
-  body TEXT NOT NULL,
+  description TEXT NOT NULL,
   published BOOLEAN NOT NULL DEFAULT 'f'
 )

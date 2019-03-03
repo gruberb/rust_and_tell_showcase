@@ -2,7 +2,7 @@ table! {
     talks (id) {
         id -> Int4,
         title -> Varchar,
-        body -> Text,
+        description -> Text,
         published -> Bool,
     }
 }
