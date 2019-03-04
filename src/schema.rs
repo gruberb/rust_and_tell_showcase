@@ -13,7 +13,7 @@ table! {
         user_id -> Int4,
         name -> Text,
         description -> Text,
-        created_at -> Timestamp,
+        created_at -> Nullable<Timestamp>,
     }
 }
 
@@ -24,10 +24,10 @@ table! {
         title -> Text,
         description -> Text,
         published -> Bool,
-        video_link -> Nullable<Text>,
-        slides_link -> Nullable<Text>,
-        created_at -> Nullable<Timestamp>,
-        updated_at -> Nullable<Timestamp>,
+        // video_link -> Nullable<Text>,
+        // slides_link -> Nullable<Text>,
+        // created_at -> Nullable<Timestamp>,
+        // updated_at -> Nullable<Timestamp>,
     }
 }
 
