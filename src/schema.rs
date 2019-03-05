@@ -13,7 +13,7 @@ table! {
         user_id -> Int4,
         name -> Text,
         description -> Text,
-        created_at -> Nullable<Timestamp>,
+        created_at -> Timestamp,
     }
 }
 
@@ -24,20 +24,18 @@ table! {
         title -> Text,
         description -> Text,
         published -> Bool,
-        // video_link -> Nullable<Text>,
-        // slides_link -> Nullable<Text>,
-        // created_at -> Nullable<Timestamp>,
-        // updated_at -> Nullable<Timestamp>,
+        video_link -> Nullable<Text>,
+        slides_link -> Nullable<Text>,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
     }
 }
 
 table! {
     users (id) {
         id -> Int4,
-        name -> Text,
         email -> Text,
-        created_at -> Nullable<Timestamp>,
-        updated_at -> Nullable<Timestamp>,
+        created_at -> Timestamp,
     }
 }
 
@@ -46,7 +44,7 @@ table! {
         id -> Int4,
         talk_id -> Int4,
         user_id -> Int4,
-        created_at -> Nullable<Timestamp>,
+        created_at -> Timestamp,
     }
 }
 
