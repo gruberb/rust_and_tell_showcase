@@ -47,6 +47,7 @@ fn main() {
 
     let mut app = tide::App::new(());
     let app_config = Configuration::build()
+        .address(String::from("0.0.0.0"))
         .port(get_server_port())
         .finalize();
 
