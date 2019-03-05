@@ -22,6 +22,7 @@ struct GitHubRedirect {
 }
 
 async fn get_github_url() -> String {
+    println!("HEERE");
     let github_uri = "https://github.com/login/oauth/authorize?scope=user:email&client_id=";
     format!("{}{:?}", github_uri, env::var("GH_BASIC_CLIENT_ID").unwrap())
 }
