@@ -12,6 +12,7 @@ use std::env;
 
 use futures::future::FutureObj;
 use tide::{configuration::Configuration, body, middleware::RequestContext, Response};
+use http::status::StatusCode;
 
 mod database;
 
@@ -21,10 +22,19 @@ struct GitHubRedirect {
     state: String,
 }
 
-async fn get_github_url() -> String {
+#[derive(Serialize, Deserialize, Clone, Debug)]
+struct GitHubUrl {
+    base: String,
+    id: String,
+}
 
-    let github_uri = "https://github.com/login/oauth/authorize?scope=user:email&client_id=";
-    format!("{}{:?}", github_uri, env::var("GH_BASIC_CLIENT_ID").unwrap())
+async fn get_github_url() -> Result<body::Json<GitHubUrl>, StatusCode> {
+    let github_url = GitHubUrl {
+        base: String::from("https://github.com/login/oauth/authorize?scope=user:email&client_id="),
+        id: env::var("GH_BASIC_CLIENT_ID").unwrap(),
+    };
+
+    Ok(body::Json(github_url))
 }
 
 async fn exchange_github_token(msg: body::Json<GitHubRedirect>) -> body::Json<GitHubRedirect> {
