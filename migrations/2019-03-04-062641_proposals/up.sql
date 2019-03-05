@@ -3,5 +3,5 @@ CREATE TABLE proposals (
   user_id SERIAL references users(id),
   name TEXT NOT NULL,
   description TEXT NOT NULL,
-  created_at TIMESTAMP DEFAULT NOW()
+  created_at TIMESTAMP NOT NULL DEFAULT NOW()
 )
