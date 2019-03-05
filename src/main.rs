@@ -16,9 +16,9 @@ use tide::{body, middleware::RequestContext, Response};
 mod database;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
-struct Message {
-    author: Option<String>,
-    contents: String,
+struct GitHubRedirect {
+    code: String,
+    state: String,
 }
 
 async fn get_github_url() -> String {
@@ -26,7 +26,7 @@ async fn get_github_url() -> String {
     format!("{}{:?}", github_uri, env::var("GH_BASIC_CLIENT_ID").unwrap())
 }
 
-async fn echo_json(msg: body::Json<Message>) -> body::Json<Message> {
+async fn exchange_github_token(msg: body::Json<GitHubRedirect>) -> body::Json<GitHubRedirect> {
     println!("JSON: {:?}", *msg);
 
     msg
@@ -44,6 +44,6 @@ fn main() {
 
     app.middleware(debug_store);
     app.at("/login").get(get_github_url);
-    app.at("/callback").get(echo_json);
+    app.at("/callback").get(exchange_github_token);
     app.serve();
 }
