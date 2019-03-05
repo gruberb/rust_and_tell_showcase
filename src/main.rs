@@ -11,7 +11,7 @@ use serde::{Serialize, Deserialize};
 use std::env;
 
 use futures::future::FutureObj;
-use tide::{body, middleware::RequestContext, Response};
+use tide::{configuration::Configuration, body, middleware::RequestContext, Response};
 
 mod database;
 
@@ -33,17 +33,26 @@ async fn exchange_github_token(msg: body::Json<GitHubRedirect>) -> body::Json<Gi
     msg
 }
 
+fn get_server_port() -> u16 {
+    env::var("PORT").ok().and_then(|p| p.parse().ok()).unwrap_or(8181)
+}
+
 fn debug_store(ctx: RequestContext<()>) -> FutureObj<Response> {
     println!("{:#?}", ctx.store());
     ctx.next()
 }
 
 fn main() {
-    let mut app = tide::App::new(());
-    println!("HEERE");
     database::establish_connection();
 
+    let mut app = tide::App::new(());
+    let app_config = Configuration::build()
+        .port(get_server_port())
+        .finalize();
+
+    app.config(app_config);
     app.middleware(debug_store);
+
     app.at("/login").get(get_github_url);
     app.at("/callback").get(exchange_github_token);
     app.serve();
