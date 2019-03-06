@@ -6,26 +6,25 @@ pub mod models;
 #[macro_use]
 extern crate diesel;
 
-use serde::{Serialize, Deserialize};
+extern crate serde_urlencoded;
 
+use serde::{Serialize, Deserialize};
 use std::env;
 
-use futures::future::FutureObj;
-use tide::{configuration::Configuration, body, middleware::RequestContext, Response};
+use tide::{configuration::Configuration, body, head::UrlQuery};
 use http::status::StatusCode;
 
 mod database;
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
-struct GitHubRedirect {
-    code: String,
-    state: String,
-}
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 struct GitHubUrl {
     base: String,
     id: String,
+}
+
+fn get_server_port() -> u16 {
+    env::var("PORT").ok().and_then(|p| p.parse().ok()).unwrap_or(8181)
 }
 
 async fn get_github_url() -> Result<body::Json<GitHubUrl>, StatusCode> {
@@ -37,19 +36,15 @@ async fn get_github_url() -> Result<body::Json<GitHubUrl>, StatusCode> {
     Ok(body::Json(github_url))
 }
 
-async fn exchange_github_token(msg: body::Json<GitHubRedirect>) -> body::Json<GitHubRedirect> {
-    println!("JSON: {:?}", *msg);
-
-    msg
+#[derive(Serialize, Deserialize, Clone, Debug)]
+struct GitHubRedirect {
+    code: String,
+    state: String,
 }
 
-fn get_server_port() -> u16 {
-    env::var("PORT").ok().and_then(|p| p.parse().ok()).unwrap_or(8181)
-}
-
-fn debug_store(ctx: RequestContext<()>) -> FutureObj<Response> {
-    println!("{:#?}", ctx.store());
-    ctx.next()
+async fn exchange_github_token(UrlQuery(query): UrlQuery<String>) -> String {
+    let query_array: GitHubRedirect = serde_urlencoded::from_str(&query).unwrap();
+    format!("{:?}", query_array.code)
 }
 
 fn main() {
@@ -62,7 +57,6 @@ fn main() {
         .finalize();
 
     app.config(app_config);
-    app.middleware(debug_store);
 
     app.at("/login").get(get_github_url);
     app.at("/callback").get(exchange_github_token);
