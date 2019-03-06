@@ -29,7 +29,7 @@ fn get_server_port() -> u16 {
 
 async fn get_github_url() -> Result<body::Json<GitHubUrl>, StatusCode> {
     let github_url = GitHubUrl {
-        base: String::from("https://github.com/login/oauth/authorize?scope=user:email&client_id="),
+        base: String::from("https://github.com/login/oauth/authorize?scope=user:email&state=rustandtell&client_id="),
         id: env::var("GH_BASIC_CLIENT_ID").unwrap(),
     };
 
@@ -44,7 +44,7 @@ struct GitHubRedirect {
 
 async fn exchange_github_token(UrlQuery(query): UrlQuery<String>) -> String {
     let query_array: GitHubRedirect = serde_urlencoded::from_str(&query).unwrap();
-    format!("{:?}", query_array.code)
+    format!("{:?},{:?}", query_array.code, query_array.state)
 }
 
 fn main() {
