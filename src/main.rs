@@ -53,8 +53,8 @@ async fn exchange_github_token(UrlQuery(query): UrlQuery<String>) -> Result<body
         &query_array.state
     );  
 
-    println!("answer get_github_token: {:?}", res);
-    let github_token: GitHubToken = res.unwrap();
+    let github_token: GitHubToken = serde_urlencoded::from_str(&res.unwrap()).unwrap();
+    println!("answer get_github_token: {:?}", github_token);
     Ok(body::Json(github_token))
 }
 
@@ -70,7 +70,7 @@ fn get_github_token(
     client_secret: &str, 
     code: &str, 
     state: &str
-) -> Result<GitHubToken , reqwest::Error> {
+) -> Result<String , reqwest::Error> {
     let mut params = HashMap::new();
     params.insert("client_id", client_id);
     params.insert("client_secret", client_secret);
@@ -83,7 +83,7 @@ fn get_github_token(
         .send()
         .expect("Failed to send request");
 
-    Ok(res.json()?)
+    Ok(res.text()?)
 }
 
 fn main() {
