@@ -43,8 +43,9 @@ struct GitHubRedirect {
 }
 
 async fn exchange_github_token(UrlQuery(query): UrlQuery<String>) -> Result<body::Json<GitHubToken>, StatusCode> {
+    println!("exchang_github_token {:?}", query);
     let query_array: GitHubRedirect = serde_urlencoded::from_str(&query).unwrap();
-
+    println!("Huhu {:?}", query_array);
     let res = get_github_token(
         &env::var("GH_BASIC_CLIENT_ID").unwrap(), 
         &env::var("GH_BASIC_SECRET_ID").unwrap(), 
@@ -53,7 +54,7 @@ async fn exchange_github_token(UrlQuery(query): UrlQuery<String>) -> Result<body
     );  
 
     let github_token: GitHubToken = res.unwrap();
-    println!("{:?}", github_token);
+    println!("Github token: {:?}", github_token);
     Ok(body::Json(github_token))
 }
 
@@ -82,7 +83,6 @@ fn get_github_token(
         .send()
         .expect("Failed to send request");
 
-    println!("{}", res.status());
     Ok(res.json()?)
 }
 
