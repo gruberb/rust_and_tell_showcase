@@ -12,7 +12,7 @@ use std::env;
 use std::collections::HashMap;
 use tide::{configuration::Configuration, body, head::UrlQuery};
 
-use reqwest::{StatusCode, Error};
+use reqwest::StatusCode;
 
 mod database;
 
@@ -53,7 +53,7 @@ async fn exchange_github_token(UrlQuery(query): UrlQuery<String>) -> Result<body
     );  
 
     let github_token: GitHubToken = res.unwrap();
-
+    println!("{:?}", github_token);
     Ok(body::Json(github_token))
 }
 
