@@ -13,7 +13,6 @@ use std::collections::HashMap;
 use tide::{configuration::Configuration, body, head::UrlQuery};
 
 use reqwest::StatusCode;
-use reqwest::Client;
 
 mod database;
 
@@ -54,9 +53,9 @@ async fn exchange_github_token(UrlQuery(query): UrlQuery<String>) -> Result<body
         &query_array.state
 );
 
-    let get_github_token: GitHubToken = res.unwrap();
-
-    Ok(body::Json(get_github_token))
+    let github_token: GitHubToken = res.unwrap();
+    println!("{:?}", github_token);
+    Ok(body::Json(github_token))
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
