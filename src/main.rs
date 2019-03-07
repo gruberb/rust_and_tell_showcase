@@ -47,11 +47,12 @@ async fn exchange_github_token(UrlQuery(query): UrlQuery<String>) -> Result<body
     let query_array: GitHubRedirect = serde_urlencoded::from_str(&query).unwrap();
 
     let res = get_github_token(
-        env::var("GH_BASIC_CLIENT_ID").unwrap(), 
-        env::var("GH_BASIC_SECRET_ID").unwrap(), 
-        query_array.code, 
-        "google.com".to_string(), 
-        query_array.state);
+        &env::var("GH_BASIC_CLIENT_ID").unwrap(), 
+        &env::var("GH_BASIC_SECRET_ID").unwrap(), 
+        &query_array.code, 
+        "google.com", 
+        &query_array.state
+);
 
     let get_github_token: GitHubToken = res.unwrap();
 
@@ -66,11 +67,11 @@ struct GitHubToken{
 }
 
 fn get_github_token(
-    client_id: String, 
-    client_secret: String, 
-    code: String, 
-    redirect_uri: String, 
-    state: String
+    client_id: &str, 
+    client_secret: &str, 
+    code: &str, 
+    redirect_uri: &str, 
+    state: &str
 ) -> Result<GitHubToken , reqwest::Error> {
     let mut map = HashMap::new();
     map.insert("clientId", client_id);
