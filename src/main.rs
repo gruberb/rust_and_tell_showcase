@@ -12,7 +12,7 @@ use std::env;
 use std::collections::HashMap;
 use tide::{configuration::Configuration, body, head::UrlQuery};
 
-use reqwest::StatusCode;
+use reqwest::{StatusCode, Error};
 
 mod database;
 
@@ -51,10 +51,10 @@ async fn exchange_github_token(UrlQuery(query): UrlQuery<String>) -> Result<body
         &query_array.code, 
         "google.com", 
         &query_array.state
-);
+    );  
 
     let github_token: GitHubToken = res.unwrap();
-    println!("{:?}", github_token);
+
     Ok(body::Json(github_token))
 }
 
@@ -82,8 +82,10 @@ fn get_github_token(
     let client = reqwest::Client::new();
     let mut res = client.post("https://github.com/login/oauth/access_token")
         .json(&map)
-        .send()?;
+        .send()
+        .expect("Failed to send request");
 
+    println!("{}", res.status());
     Ok(res.json()?)
 }
 
