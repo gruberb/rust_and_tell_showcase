@@ -49,7 +49,6 @@ async fn exchange_github_token(UrlQuery(query): UrlQuery<String>) -> Result<body
         &env::var("GH_BASIC_CLIENT_ID").unwrap(), 
         &env::var("GH_BASIC_SECRET_ID").unwrap(), 
         &query_array.code, 
-        "google.com", 
         &query_array.state
     );  
 
@@ -69,14 +68,12 @@ fn get_github_token(
     client_id: &str, 
     client_secret: &str, 
     code: &str, 
-    redirect_uri: &str, 
     state: &str
 ) -> Result<GitHubToken , reqwest::Error> {
     let mut params = HashMap::new();
     params.insert("client_id", client_id);
     params.insert("client_secret", client_secret);
     params.insert("code", code);
-    params.insert("redirect_uri", redirect_uri);
     params.insert("state", state);
 
     let client = reqwest::Client::new();
