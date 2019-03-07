@@ -5,14 +5,15 @@ pub mod models;
 
 #[macro_use]
 extern crate diesel;
-
 extern crate serde_urlencoded;
 
 use serde::{Serialize, Deserialize};
 use std::env;
-
+use std::collections::HashMap;
 use tide::{configuration::Configuration, body, head::UrlQuery};
-use http::status::StatusCode;
+
+use reqwest::StatusCode;
+use reqwest::Client;
 
 mod database;
 
@@ -42,9 +43,49 @@ struct GitHubRedirect {
     state: String,
 }
 
-async fn exchange_github_token(UrlQuery(query): UrlQuery<String>) -> String {
+async fn exchange_github_token(UrlQuery(query): UrlQuery<String>) -> Result<body::Json<GitHubToken>, StatusCode> {
     let query_array: GitHubRedirect = serde_urlencoded::from_str(&query).unwrap();
-    format!("{:?},{:?}", query_array.code, query_array.state)
+    format!("{:?},{:?}", query_array.code, query_array.state);
+
+    let res = get_github_token(
+        env::var("GH_BASIC_CLIENT_ID").unwrap(), 
+        env::var("GH_BASIC_CLIENT_SECRET").unwrap(), 
+        query_array.code, 
+        "google.com".to_string(), 
+        query_array.state);
+
+    let get_github_token: GitHubToken = res.unwrap();
+
+    Ok(body::Json(get_github_token))
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+struct GitHubToken{
+    access_token: String,
+    scope: String,
+    token_type: String,
+}
+
+fn get_github_token(
+    client_id: String, 
+    client_secret: String, 
+    code: String, 
+    redirect_uri: String, 
+    state: String
+) -> Result<GitHubToken , reqwest::Error> {
+    let mut map = HashMap::new();
+    map.insert("clientId", client_id);
+    map.insert("client_secret", client_secret);
+    map.insert("code", code);
+    map.insert("redirect_uri", redirect_uri);
+    map.insert("state", state);
+
+    let client = reqwest::Client::new();
+    let mut res = client.post("https://github.com/login/oauth/access_token")
+        .json(&map)
+        .send()?;
+
+    Ok(res.json()?)
 }
 
 fn main() {
