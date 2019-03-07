@@ -73,7 +73,7 @@ fn get_github_token(
     state: &str
 ) -> Result<GitHubToken , reqwest::Error> {
     let mut params = HashMap::new();
-    params.insert("clientId", client_id);
+    params.insert("client_id", client_id);
     params.insert("client_secret", client_secret);
     params.insert("code", code);
     params.insert("redirect_uri", redirect_uri);
