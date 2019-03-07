@@ -72,16 +72,16 @@ fn get_github_token(
     redirect_uri: &str, 
     state: &str
 ) -> Result<GitHubToken , reqwest::Error> {
-    let mut map = HashMap::new();
-    map.insert("clientId", client_id);
-    map.insert("client_secret", client_secret);
-    map.insert("code", code);
-    map.insert("redirect_uri", redirect_uri);
-    map.insert("state", state);
+    let mut params = HashMap::new();
+    params.insert("clientId", client_id);
+    params.insert("client_secret", client_secret);
+    params.insert("code", code);
+    params.insert("redirect_uri", redirect_uri);
+    params.insert("state", state);
 
     let client = reqwest::Client::new();
     let mut res = client.post("https://github.com/login/oauth/access_token")
-        .json(&map)
+        .form(&params)
         .send()
         .expect("Failed to send request");
 
