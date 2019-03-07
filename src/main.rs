@@ -45,7 +45,6 @@ struct GitHubRedirect {
 
 async fn exchange_github_token(UrlQuery(query): UrlQuery<String>) -> Result<body::Json<GitHubToken>, StatusCode> {
     let query_array: GitHubRedirect = serde_urlencoded::from_str(&query).unwrap();
-    format!("{:?},{:?}", query_array.code, query_array.state);
 
     let res = get_github_token(
         env::var("GH_BASIC_CLIENT_ID").unwrap(), 
