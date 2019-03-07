@@ -53,8 +53,8 @@ async fn exchange_github_token(UrlQuery(query): UrlQuery<String>) -> Result<body
         &query_array.state
     );  
 
+    println!("answer get_github_token: {:?}", res);
     let github_token: GitHubToken = res.unwrap();
-    println!("Github token: {:?}", github_token);
     Ok(body::Json(github_token))
 }
 
