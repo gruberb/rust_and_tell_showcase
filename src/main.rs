@@ -49,7 +49,7 @@ async fn exchange_github_token(UrlQuery(query): UrlQuery<String>) -> Result<body
 
     let res = get_github_token(
         env::var("GH_BASIC_CLIENT_ID").unwrap(), 
-        env::var("GH_BASIC_CLIENT_SECRET").unwrap(), 
+        env::var("GH_BASIC_SECRET_ID").unwrap(), 
         query_array.code, 
         "google.com".to_string(), 
         query_array.state);
