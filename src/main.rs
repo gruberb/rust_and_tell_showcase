@@ -23,6 +23,11 @@ struct GitHubUrl {
     id: String,
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug)]
+struct Hello {
+    hello: String,
+}
+
 fn get_server_port() -> u16 {
     env::var("PORT").ok().and_then(|p| p.parse().ok()).unwrap_or(8181)
 }
@@ -34,6 +39,14 @@ async fn get_github_url() -> Result<body::Json<GitHubUrl>, StatusCode> {
     };
 
     Ok(body::Json(github_url))
+}
+
+async fn index() -> Result<body::Json<Hello>, StatusCode> {
+    let hi = Hello {
+        hello: "world".to_string(),
+    };
+
+    Ok(body::Json(hi))
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -97,6 +110,7 @@ fn main() {
 
     app.config(app_config);
 
+    app.at("/").get(index);
     app.at("/login").get(get_github_url);
     app.at("/callback").get(exchange_github_token);
     app.serve();
