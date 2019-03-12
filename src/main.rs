@@ -15,6 +15,7 @@ use tide::{configuration::Configuration, body, head::UrlQuery};
 use reqwest::StatusCode;
 
 mod database;
+mod route_handlers;
 
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -30,15 +31,6 @@ struct Hello {
 
 fn get_server_port() -> u16 {
     env::var("PORT").ok().and_then(|p| p.parse().ok()).unwrap_or(8181)
-}
-
-async fn get_github_url() -> Result<body::Json<GitHubUrl>, StatusCode> {
-    let github_url = GitHubUrl {
-        base: String::from("https://github.com/login/oauth/authorize?scope=user:email&state=rustandtell&client_id="),
-        id: env::var("GH_BASIC_CLIENT_ID").unwrap(),
-    };
-
-    Ok(body::Json(github_url))
 }
 
 async fn index() -> Result<body::Json<Hello>, StatusCode> {
@@ -111,7 +103,7 @@ fn main() {
     app.config(app_config);
 
     app.at("/").get(index);
-    app.at("/login").get(get_github_url);
+    app.at("/login").get(route_handlers::get_github_url);
     app.at("/callback").get(exchange_github_token);
     app.serve();
 }
