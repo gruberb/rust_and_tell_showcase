@@ -11,34 +11,14 @@ use serde::{Serialize, Deserialize};
 use std::env;
 use std::collections::HashMap;
 use tide::{configuration::Configuration, body, head::UrlQuery};
-
 use reqwest::StatusCode;
 
 mod database;
 mod route_handlers;
 
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
-struct GitHubUrl {
-    base: String,
-    id: String,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-struct Hello {
-    hello: String,
-}
-
 fn get_server_port() -> u16 {
     env::var("PORT").ok().and_then(|p| p.parse().ok()).unwrap_or(8181)
-}
-
-async fn index() -> Result<body::Json<Hello>, StatusCode> {
-    let hi = Hello {
-        hello: "world".to_string(),
-    };
-
-    Ok(body::Json(hi))
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -102,8 +82,7 @@ fn main() {
 
     app.config(app_config);
 
-    app.at("/").get(index);
-    app.at("/login").get(route_handlers::get_github_url);
+    app.at("/").get(route_handlers::index);
     app.at("/callback").get(exchange_github_token);
     app.serve();
 }

@@ -1,12 +1,31 @@
-use tide::body;
 use std::env;
-use reqwest::StatusCode;
+use ramhorns::{Template, Content};
+use http::Response;
 
-pub async fn get_github_url() -> Result<body::Json<String>, StatusCode> {
+pub async fn index() -> Response<String> {
     let github_base = "https://github.com/login/oauth/authorize";
     let scope = "scope=user:email";
     let state = "state=rustandtell";
     let client_id = format!("client_id={}", env::var("GH_BASIC_CLIENT_ID").unwrap());
 
-    Ok(body::Json(format!("{}?{}&{}&{}", github_base, scope, state, client_id)))
+    #[derive(Content)]
+    struct Login {
+        button: String,
+        link: String,
+    }
+
+    let source = "<h1>Welcome to Rust and Tell Berlin</h1>\
+                <a href='{{link}}'>{{button}}</a>";
+
+    let tpl = Template::new(source).unwrap();
+
+    let str = tpl.render(&Login {
+        button: "Login".to_string(),
+        link: format!("{}?{}&{}&{}", github_base, scope, state, client_id),
+    });
+
+    Response::builder()
+        .header("Content-Type", "text/html; charset=utf-8")
+        .body(str)
+        .unwrap()
 }
