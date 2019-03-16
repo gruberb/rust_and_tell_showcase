@@ -76,9 +76,7 @@ pub async fn user_info(UrlQuery(query): UrlQuery<String>) -> Response<String> {
 
     };
 
-    let user_emails = serde_json::from_str(&result);
-
-    let user_emails = match user_emails {
+    let user_emails: Vec<models::UserEmail> = match serde_json::from_str(&result) {
         Ok(emails) => emails,
         Err(error) => panic!("There was a problem with parsing emails: {:?}", error)
     };
