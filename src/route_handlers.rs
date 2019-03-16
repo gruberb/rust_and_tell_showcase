@@ -27,8 +27,16 @@ struct Login {
 }
 
 #[derive(Content, Serialize, Deserialize, Clone, Debug)]
+struct UserEmail {
+    email: String,
+    verified: bool,
+    primary: bool,
+    visibility: String,
+}
+
+#[derive(Content, Serialize, Deserialize, Clone, Debug)]
 struct UserInfo {
-    emails: Vec<String>,
+    emails: Vec<UserEmail>,
 }
 
 pub async fn index() -> Response<String> {
@@ -61,8 +69,8 @@ pub async fn user_info(UrlQuery(query): UrlQuery<String>) -> Response<String> {
     let token = auth::get_github_token(&query_array.code, &query_array.state);
     let github_token: GitHubToken = serde_urlencoded::from_str(&token.unwrap()).unwrap();
     
-    let emails = github::get_github_emails(&github_token.access_token);
-    let user_info: UserInfo = serde_urlencoded::from_str(&emails.unwrap()).unwrap();
+    let mut res = github::get_github_emails(&github_token.access_token);
+    let user_info = res.json::<UserInfo>().unwrap();
 
     let source = "<h1>Welcome</h1>\
               {{#emails}}<p>{{email}}</p>{{/emails}}";
