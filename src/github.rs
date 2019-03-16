@@ -4,6 +4,6 @@ pub fn get_github_emails(access_token: &str) -> Result<String, reqwest::Error>  
         .query(&[("access_token", access_token)])
         .send()
         .expect("Failed to send request");
-
+    
     Ok(res.text()?)
 }

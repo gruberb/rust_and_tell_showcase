@@ -62,7 +62,6 @@ pub async fn user_info(UrlQuery(query): UrlQuery<String>) -> Response<String> {
     let token = auth::get_github_token(&query_array.code, &query_array.state);
     let github_token: GitHubToken = serde_urlencoded::from_str(&token.unwrap()).unwrap();
     
-
     let mut user = models::User {
         email: String::from(""),
         token: github_token.access_token.to_owned(),
@@ -70,10 +69,10 @@ pub async fn user_info(UrlQuery(query): UrlQuery<String>) -> Response<String> {
 
     // Use the access token from the get_github_token response to fetch user information
     let result = github::get_github_emails(&github_token.access_token); 
+    println!("{:?}", result);
 
     let v: Vec<models::UserEmail> = serde_json::from_str(&result.unwrap()).unwrap();
 
-    println!("{:?}", v);
 
     for x in v {
         if x.primary {
