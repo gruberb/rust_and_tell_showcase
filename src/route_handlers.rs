@@ -3,6 +3,7 @@ use ramhorns::{Template, Content};
 use http::Response;
 use serde::{Serialize, Deserialize};
 use tide::{head::UrlQuery};
+use serde_json::Value;
 
 use crate::auth;
 use crate::github;
@@ -65,10 +66,10 @@ pub async fn user_info(UrlQuery(query): UrlQuery<String>) -> Response<String> {
     // Use the access token from the get_github_token response to fetch user information
     let result = github::get_github_emails(&github_token.access_token); 
 
-    let user: models::User = result
-        .map(|emails| models::User { emails, token: github_token.access_token }).unwrap();
+    let v: Value = serde_json::from_str(&result.unwrap()).unwrap();
 
-    println!("{:?}", user);
+    println!("{:?}", v);
+    // println!("{:?}", user);
     // if res.is_err() {
     //     return res;
     // }
