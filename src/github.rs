@@ -1,12 +1,14 @@
 use std::collections::HashMap;
 
-pub fn get_github_emails(access_token: &str) -> reqwest::Response {
+pub fn get_github_emails(access_token: &str) -> Result<String, reqwest::Error>  {
     let mut params = HashMap::new();
     params.insert("access_token", access_token);
 
     let client = reqwest::Client::new();
-    client.post("https://api.github.com/user/emails")
+    let mut res = client.post("https://api.github.com/user/emails")
         .form(&params)
         .send()
-        .expect("Failed to send request")
+        .expect("Failed to send request");
+
+    Ok(res.json()?)
 }

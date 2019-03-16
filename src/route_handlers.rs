@@ -34,11 +34,6 @@ struct UserEmail {
     visibility: String,
 }
 
-#[derive(Content, Serialize, Deserialize, Clone, Debug)]
-struct UserInfo {
-    emails: Vec<UserEmail>,
-}
-
 pub async fn index() -> Response<String> {
     let github_base = "https://github.com/login/oauth/authorize";
     let scope = "scope=user:email";
@@ -64,25 +59,34 @@ pub async fn index() -> Response<String> {
 }
 
 pub async fn user_info(UrlQuery(query): UrlQuery<String>) -> Response<String> {
+    // Get the query params from  the UrlQuery String and deserialse them into
+    // a GitHubRedirect struct
     let query_array: GitHubRedirect = serde_urlencoded::from_str(&query).unwrap();
     
+    // Use the query params to request a GitHub token via the api
     let token = auth::get_github_token(&query_array.code, &query_array.state);
     let github_token: GitHubToken = serde_urlencoded::from_str(&token.unwrap()).unwrap();
     
-    let mut res = github::get_github_emails(&github_token.access_token);
-    let user_info = res.json::<UserInfo>().unwrap();
+    // Use the access token from the get_github_token response to fetch user information
+    let res = match github::get_github_emails(&github_token.access_token) {
+        Ok(r) => r,
+        Err(e) => e.to_string(),
+    };
+    
+    // Transform the response into a json with the structure of UserInfo,
+    // unwrap the result<Response<UserInfo>, Error>
 
-    let source = "<h1>Welcome</h1>\
-              {{#emails}}<p>{{email}}</p>{{/emails}}";
+    // let source = "<h1>Welcome</h1>\
+    //           {{#emails}}<p>{{email}}</p>{{/emails}}";
 
-    let tpl = Template::new(source).unwrap();
+    // let tpl = Template::new(source).unwrap();
 
-    let str = tpl.render(&UserInfo {
-        emails: user_info.emails,
-    });
+    // let str = tpl.render(&UserInfo {
+    //     emails: user_info.emails,
+    // });
 
     Response::builder()
         .header("Content-Type", "text/html; charset=utf-8")
-        .body(str)
+        .body(res)
         .unwrap()
 }
