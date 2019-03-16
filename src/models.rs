@@ -1,5 +1,7 @@
 // use chrono::{NaiveDate};
 use super::schema::talks;
+use ramhorns::Content;
+use serde::{Serialize, Deserialize};
 
 #[derive(Queryable)]
 pub struct Talk {
@@ -20,3 +22,18 @@ pub struct NewTalk<'a> {
     pub title: &'a str,
     pub description: &'a str,
 }
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct User {
+    pub emails: Vec<UserEmail>,
+    pub token: String,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct UserEmail {
+    email: String,
+    verified: bool,
+    primary: bool,
+    visibility: String,
+}
+

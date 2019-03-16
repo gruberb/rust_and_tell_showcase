@@ -6,6 +6,7 @@ use tide::{head::UrlQuery};
 
 use crate::auth;
 use crate::github;
+use crate::models;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 struct GitHubRedirect {
@@ -26,13 +27,7 @@ struct Login {
     link: String,
 }
 
-#[derive(Content, Serialize, Deserialize, Clone, Debug)]
-struct UserEmail {
-    email: String,
-    verified: bool,
-    primary: bool,
-    visibility: String,
-}
+
 
 pub async fn index() -> Response<String> {
     let github_base = "https://github.com/login/oauth/authorize";
@@ -68,25 +63,37 @@ pub async fn user_info(UrlQuery(query): UrlQuery<String>) -> Response<String> {
     let github_token: GitHubToken = serde_urlencoded::from_str(&token.unwrap()).unwrap();
     
     // Use the access token from the get_github_token response to fetch user information
-    let res = match github::get_github_emails(&github_token.access_token) {
-        Ok(r) => r,
-        Err(e) => e.to_string(),
-    };
+    let result = github::get_github_emails(&github_token.access_token); 
+
+    let user: models::User = result
+        .map(|emails| models::User { emails, token: github_token.access_token }).unwrap();
+
+    println!("{:?}", user);
+    // if res.is_err() {
+    //     return res;
+    // }
+
+    // println!("{:?}", user_emails);
+    // // let user_emails: Vec<UserEmail> = match res {
+    // //     Ok(r) => serde_json::from_str(&r)
+    // // };
+
+    // // let user_emails: Vec<UserEmail> = serde_json::from_str(&res.unwrap());
     
-    // Transform the response into a json with the structure of UserInfo,
-    // unwrap the result<Response<UserInfo>, Error>
+    // // Transform the response into a json with the structure of UserInfo,
+    // // unwrap the result<Response<UserInfo>, Error>
 
-    // let source = "<h1>Welcome</h1>\
-    //           {{#emails}}<p>{{email}}</p>{{/emails}}";
+    // // let source = "<h1>Welcome</h1>\
+    // //           {{#emails}}<p>{{email}}</p>{{/emails}}";
 
-    // let tpl = Template::new(source).unwrap();
+    // // let tpl = Template::new(source).unwrap();
 
-    // let str = tpl.render(&UserInfo {
-    //     emails: user_info.emails,
-    // });
+    // // let str = tpl.render(&UserInfo {
+    // //     emails: user_info.emails,
+    // // });
 
     Response::builder()
         .header("Content-Type", "text/html; charset=utf-8")
-        .body(res)
+        .body("All right".to_string())
         .unwrap()
 }
