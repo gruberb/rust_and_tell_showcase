@@ -62,7 +62,7 @@ pub async fn user_info(UrlQuery(query): UrlQuery<String>) -> Response<String> {
     let token = auth::get_github_token(&query_array.code, &query_array.state);
     let github_token: GitHubToken = serde_urlencoded::from_str(&token.unwrap()).unwrap();
     
-    let mut user = models::User {
+    let user = models::User {
         email: String::from(""),
         token: github_token.access_token.to_owned(),
     };
@@ -70,8 +70,20 @@ pub async fn user_info(UrlQuery(query): UrlQuery<String>) -> Response<String> {
     // Use the access token from the get_github_token response to fetch user information
     let result = github::get_github_emails(&github_token.access_token); 
 
-    let v: Vec<models::UserEmail> = serde_json::from_str(&result.unwrap()).unwrap();
-    println!("{:?}", v);
+    let result = match result {
+        Ok(github_emails) => github_emails,
+        Err(error) => panic!("There was a problem with getting emails: {:?}", error),
+
+    };
+
+    let user_emails = serde_json::from_str(&result);
+
+    let user_emails = match user_emails {
+        Ok(emails) => emails,
+        Err(error) => panic!("There was a problem with parsing emails: {:?}", error)
+    };
+
+    println!("{:?}", user_emails);
     // for x in v {
     //     if x.primary {
     //         user.email = x.email;
