@@ -5,7 +5,7 @@ pub fn get_github_emails(access_token: &str) -> Result<String, reqwest::Error>  
     params.insert("access_token", access_token);
 
     let client = reqwest::Client::new();
-    let mut res = client.post("https://api.github.com/user/emails")
+    let mut res = client.post("https://api.github.com/user/public_emails")
         .form(&params)
         .send()
         .expect("Failed to send request");
