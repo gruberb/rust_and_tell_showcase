@@ -70,8 +70,8 @@ pub async fn user_info(UrlQuery(query): UrlQuery<String>) -> Response<String> {
     // Use the access token from the get_github_token response to fetch user information
     let result = github::get_github_emails(&github_token.access_token); 
 
-    // let v: Vec<models::UserEmail> = serde_json::from_str(&result.unwrap()).unwrap();
-
+    let v: Vec<models::UserEmail> = serde_json::from_str(&result.unwrap()).unwrap();
+    println!("{:?}", v);
     // for x in v {
     //     if x.primary {
     //         user.email = x.email;
@@ -89,6 +89,6 @@ pub async fn user_info(UrlQuery(query): UrlQuery<String>) -> Response<String> {
 
     Response::builder()
         .header("Content-Type", "text/html; charset=utf-8")
-        .body(result.unwrap())
+        .body(String::from("TEST"))
         .unwrap()
 }

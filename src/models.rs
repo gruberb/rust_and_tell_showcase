@@ -37,8 +37,8 @@ pub struct DisplayUser {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct UserEmail {
     pub email: String,
-    verified: bool,
+    pub verified: bool,
     pub primary: bool,
-    visibility: String,
+    pub visibility: String,
 }
 
