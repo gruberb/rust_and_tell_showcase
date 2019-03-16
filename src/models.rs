@@ -25,15 +25,20 @@ pub struct NewTalk<'a> {
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct User {
-    pub emails: Vec<UserEmail>,
+    pub email: String,
     pub token: String,
+}
+
+#[derive(Content)]
+pub struct DisplayUser {
+    pub email: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct UserEmail {
-    email: String,
+    pub email: String,
     verified: bool,
-    primary: bool,
+    pub primary: bool,
     visibility: String,
 }
 
