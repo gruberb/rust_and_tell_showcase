@@ -39,6 +39,6 @@ pub struct UserEmail {
     pub email: String,
     pub verified: bool,
     pub primary: bool,
-    pub visibility: String,
+    pub visibility: Option<String>,
 }
 

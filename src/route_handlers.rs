@@ -62,7 +62,7 @@ pub async fn user_info(UrlQuery(query): UrlQuery<String>) -> Response<String> {
     let token = auth::get_github_token(&query_array.code, &query_array.state);
     let github_token: GitHubToken = serde_urlencoded::from_str(&token.unwrap()).unwrap();
     
-    let user = models::User {
+    let mut user = models::User {
         email: String::from(""),
         token: github_token.access_token.to_owned(),
     };
@@ -81,24 +81,23 @@ pub async fn user_info(UrlQuery(query): UrlQuery<String>) -> Response<String> {
         Err(error) => panic!("There was a problem with parsing emails: {:?}", error)
     };
 
-    println!("{:?}", user_emails);
-    // for x in v {
-    //     if x.primary {
-    //         user.email = x.email;
-    //     }
-    // }
+    for user_email in user_emails {
+        if user_email.primary {
+            user.email = user_email.email;
+        }
+    }
 
-    // let source = "<h1>Welcome</h1>\
-    //           <p>{{email}}</p>";
+    let source = "<h1>Welcome</h1>\
+              <p>{{email}}</p>";
 
-    // let tpl = Template::new(source).unwrap();
+    let tpl = Template::new(source).unwrap();
 
-    // let str = tpl.render(&models::DisplayUser {
-    //     email: user.email,
-    // });
+    let str = tpl.render(&models::DisplayUser {
+        email: user.email,
+    });
 
     Response::builder()
         .header("Content-Type", "text/html; charset=utf-8")
-        .body(String::from("TEST"))
+        .body(str)
         .unwrap()
 }
