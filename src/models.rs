@@ -42,3 +42,22 @@ pub struct UserEmail {
     pub visibility: Option<String>,
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct GitHubRedirect {
+    pub code: String,
+    pub state: String,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct GitHubToken{
+    pub access_token: String,
+    pub scope: String,
+    pub token_type: String,
+}
+
+#[derive(Content)]
+pub struct Login {
+    pub title: String,
+    pub link: String,
+}
+
